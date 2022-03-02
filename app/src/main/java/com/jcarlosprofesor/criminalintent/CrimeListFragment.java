@@ -1,7 +1,5 @@
 package com.jcarlosprofesor.criminalintent;
-
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,211 +9,260 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.Date;
 import java.util.List;
-
 public class CrimeListFragment extends Fragment {
 
+    //Defino una interface para
+    public interface Callbacks{
+        void onCrimeSelected(Crime crime);
+    }
+
+    //Declaro los widget necesarios
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
     private boolean mSubtitleVisible;
-    //1º En primer lugar definimos una variable miembro que guarde un objeto que implemente
-    //Callbacks
+
+    //Declaro una variable interface para la comunicacion con el fragment
     private Callbacks mCallbacks;
 
-    //2º Definimos la interface requerida para las activity que albergan al fragment
-    public interface Callbacks{
-        //Metodo que nos va a permitir comunicar el crimen seleccionado
-        void onCrimeSelected(Crime crime);
-    }
-    //3º Sobreescribimos los metodos del ciclo de vida de los fragment.
-    //En el metodo onAttach asignamos la activity
+    //Metodo para obtener el contexto una vez se asocia el fragment
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mCallbacks = (Callbacks) context;
+        this.mCallbacks = (Callbacks) context;
     }
 
+    //Metodo para retirar la interface antes de ser eliminado el fragment
     @Override
     public void onDetach() {
         super.onDetach();
-        mCallbacks = null;
+        this.mCallbacks = null;
     }
 
-    //Indicamos al FragmentManager que su fragment va a recibir
-    //una llamada al metodo onCreateOptionsMenu
-    //Indicamos al FragmentManager que CrimeListFragment va a recibir
-    //llamadas del menu
+    //Metodo que es llamado segun el ciclo de vida del fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Indico que tenemos un menu en este fragment
         setHasOptionsMenu(true);
     }
 
-    private class CrimeHolder extends RecyclerView.ViewHolder
-    implements View.OnClickListener{
+    //Declaro una clase interna privada
+    private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+        //Declaro los widget necesarios
         private TextView mTitleTextView;
         private TextView mDateTextView;
         private ImageView mSolvedImageView;
         private Crime mCrime;
 
-
-
-        public CrimeHolder(LayoutInflater inflater, ViewGroup parent ){
+        //Defino un constructor donde serializamos sus componentes
+        public CrimeHolder(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.list_item_crime,parent,false));
-            mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
-            mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
-            mSolvedImageView = (ImageView) itemView.findViewById(R.id.crime_solved_img);
-            itemView.setOnClickListener(this);
+            this.mTitleTextView = (TextView) itemView.findViewById(R.id.crime_title);
+            this.mDateTextView = (TextView) itemView.findViewById(R.id.crime_date);
+            this.mSolvedImageView = (ImageView) itemView.findViewById(R.id.crime_solved_img);
+            this.itemView.setOnClickListener(this);
 
         }
+
+        //Metodo que carga el contenido de un crime al ser llamado
         public void bind(Crime crime){
-            mCrime = crime;
-            mTitleTextView.setText(mCrime.getTitle());
-            mDateTextView.setText(mCrime.getDate().toString());
-            mSolvedImageView.setVisibility(crime.isSolved()?View.VISIBLE:View.GONE);
-        }
-        public String formatDate(Date dateCrime){
-            
-          return null;
+            this.mCrime = crime;
+            this.mTitleTextView.setText(mCrime.getTitle());
+            this.mDateTextView.setText(mCrime.getDate().toString());
+            this.mSolvedImageView.setVisibility(crime.isSolved()?View.VISIBLE:View.GONE);
         }
 
+        //Metodo que se ejecuta al hacer click en la view enviando un crime
         @Override
         public void onClick(View v) {
-            /*Toast.makeText(getActivity(),
-                            mCrime.getTitle() + " clicked!", Toast.LENGTH_SHORT)
-                            .show();*/
-            //Intent intent = CrimeActivity.newIntent(getActivity(),mCrime.getId());
-            /*Intent intent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId());
-            startActivity(intent);*/
             mCallbacks.onCrimeSelected(mCrime);
         }
+
     }
+
+    //Declaro una clase interna privada
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
 
+        //Declaro una lista de crimes privada
         private List<Crime> mCrimes;
 
-        public CrimeAdapter(List<Crime> crimes){
-            mCrimes = crimes;
-        }
+        //Defino un constructor
+        public CrimeAdapter(List<Crime> crimes){this.mCrimes = crimes;}
 
+        //Metodo que define la view del holder
         @NonNull
         @Override
         public CrimeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new CrimeHolder(layoutInflater,parent);
+            return new CrimeHolder(LayoutInflater.from(getActivity()),parent);
         }
 
+        //Metodo que es llamado al estar en una determinada posicion
         @Override
         public void onBindViewHolder(@NonNull CrimeHolder holder, int position) {
-            Crime crime = mCrimes.get(position);
-            holder.bind(crime);
+
+            //Llamado al metodo para actualizar el contenido de sus widget
+            holder.bind( this.mCrimes.get(position));
+
         }
 
+        //Metodo que obtiene el tamaño de la lista
         @Override
-        public int getItemCount() {
-            return mCrimes.size();
-        }
+        public int getItemCount() {return mCrimes.size();}
 
         //Metodo que reemplaza la lista de crimenes que se muestran
-        public void setCrimes (List<Crime> crimes){
-            mCrimes = crimes;
-        }
+        public void setCrimes (List<Crime> crimes){this.mCrimes = crimes;}
+
     }
 
+    //Metodo que actualiza la view segun el ciclo de vida del fragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-
+        //Instancio una view y la asocio al fragment
         View view = inflater.inflate(R.layout.fragment_crime_list,container,false);
 
-        mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
-        mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //Serializo la recyclerview
+        this.mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
 
+        //Indico el recyclerview como se van a disponer las view
+        this.mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        //Obtengo un crimelab
         CrimeLab crimeLab = CrimeLab.get(getActivity());
+
+        //Mediante el crimelab relleno la lista
         List<Crime> crimes = crimeLab.getCrimes();
 
-        mAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mAdapter);
+        //Inserto en el adapter los crimes
+        this.mAdapter = new CrimeAdapter(crimes);
 
+        //Asociamos el adapter a la recyclerview
+        this.mCrimeRecyclerView.setAdapter(mAdapter);
         return view;
+
     }
 
+    //Metodo que es llamado al salir el fragment de segundo plano
     public void onResume(){
         super.onResume();
         updateUI();
     }
-    //hacemos public updateUI para que pueda ser llamado desde CrimeListActivity
+
+    //Metodo que actualiza nuestra UI
     public void updateUI(){
+
+        //Instancio un crimelab
         CrimeLab crimeLab = CrimeLab.get(getActivity());
+
+        //Instancio una lista de crimes y obtengo los del crimelab
         List<Crime> crimes = crimeLab.getCrimes();
-        if(mAdapter == null){
-            mAdapter = new CrimeAdapter(crimes);
-            mCrimeRecyclerView.setAdapter(mAdapter);
+
+        //Si el adapter es nulo accedemos
+        if(this.mAdapter == null){
+
+            //Creamos un nuevo adapter y le insertamos los crimes
+            this.mAdapter = new CrimeAdapter(crimes);
+
+            //Asociamos el adapter a la recyclerview
+            this.mCrimeRecyclerView.setAdapter(mAdapter);
+
         }else{
+
             //Actualizamos la lista que debe usar el adaptador para mostrar los crimenes
-            mAdapter.setCrimes(crimes);
-            mAdapter.notifyDataSetChanged();
+            this.mAdapter.setCrimes(crimes);
+
+            //Notificamos que ha habido un cambio en los datos
+            this.mAdapter.notifyDataSetChanged();
+
         }
+
     }
 
     //Inyectamos el archivo de layout del menu, en el objeto menu
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
+        //Asociamos el menu al fragment
         inflater.inflate(R.menu.fragment_crime_list,menu);
 
         //Actualizamos el menu
         MenuItem subtitleItem = menu.findItem(R.id.show_subtitle);
-        if(mSubtitleVisible){
-            subtitleItem.setTitle(R.string.hide_subtitle);
-        }else
-        {
-            subtitleItem.setTitle(R.string.show_subtitle);
-        }
+
+        //Si los subtitulos estan invisbles muestra un titulo u otro
+        subtitleItem = this.mSubtitleVisible ?
+                subtitleItem.setTitle(R.string.hide_subtitle):
+                subtitleItem.setTitle(R.string.show_subtitle);
+
     }
 
+    //Metodo que define las opciones del menu
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        //Declaramos un switch y obtenemos la ID del item pulsado
         switch (item.getItemId()){
+
+            //Si el ID es newcrime
             case R.id.new_crime:
+
+                //Instanciamos un crime
                 Crime crime = new Crime();
+
+                //Añadimos el crime
                 CrimeLab.get(getActivity()).addCrime(crime);
-                /*Intent intent = CrimePagerActivity
-                        .newIntent(getActivity(),crime.getId());
-                startActivity(intent);*/
+
+                //Actualizamos la UI
                 updateUI();
+
+                //Enviamos el crime mediante la interfaz
                 mCallbacks.onCrimeSelected(crime);
                 return true;
+
+
+            //Si el id es show subtitle
             case R.id.show_subtitle:
-                mSubtitleVisible = !mSubtitleVisible;
+
+                //Invertiamos el valor de la variable
+                this.mSubtitleVisible = !this.mSubtitleVisible;
+
+                //Declaramos un cambio en el menu
                 getActivity().invalidateOptionsMenu();
+
+                //Actualizamos los subtitulos
                 updateSubtitle();
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
+
         }
 
     }
-    private void updateSubtitle(){
-        CrimeLab crimeLab = CrimeLab.get(getActivity());
-        int crimeCount = crimeLab.getCrimes().size();
-        String subtitle = getString(R.string.subtitle_format,crimeCount);
 
-        if(!mSubtitleVisible){
-            subtitle=null;
-        }
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.getSupportActionBar().setSubtitle(subtitle);
+    //Metodo para actualizar el subtitulo
+    private void updateSubtitle(){
+
+        //Obtenemos el tamaño de lai
+        int crimeCount = CrimeLab.get(getActivity()).getCrimes().size();
+
+        ((AppCompatActivity) getActivity()) //Obtenemos la activity
+                .getSupportActionBar()      //Obtenemos el menu
+                .setSubtitle(               //Indicamos el valor del subtitulo
+                !mSubtitleVisible ?         //Si esta visible le cambiamos el valro sino, sera nulo
+                null :
+                getString(R.string.subtitle_format,crimeCount));
+
     }
 }

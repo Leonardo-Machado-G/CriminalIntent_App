@@ -51,9 +51,7 @@ public class CrimeFragment extends Fragment {
 
     /*Interface requerida para las activity que quieran albergar un fragment.*/
     public interface Callbacks{
-
         void onCrimeUpdated(Crime crime);
-
     }
 
     //Instancio constantes para el DataPickerFragment y el ID
@@ -149,7 +147,7 @@ public class CrimeFragment extends Fragment {
                         mPhotoFile);
 
                 //Inserto en el intent el provider
-                //MediaStore provee una coleccion indexada de medios como audio, imagenes...
+                //MediaStore provee una coleccion indexada de medios como audio, imagenes
                 //Contiene definiciones para URI es el contrato entre el proveedor de medios y las aplicaciones
                 captureImage.putExtra(MediaStore.EXTRA_OUTPUT,uri);
 
@@ -158,7 +156,7 @@ public class CrimeFragment extends Fragment {
                         getActivity()
                         .getPackageManager()//PackManager obtiene el tipo de informacion relacionada con los paquete instalados
                         .queryIntentActivities( //Query obtiene todas las actividades que puedan realizar el intent
-                                captureImage,
+                                captureImage, //Lo asocio el intent
                                 PackageManager.MATCH_DEFAULT_ONLY); //Establezco un flag para un package
 
                 //Recorro la lista de resolveinfo
@@ -167,7 +165,7 @@ public class CrimeFragment extends Fragment {
                     getActivity() //Contexto
                     .grantUriPermission( //Otorgo permiso temporal a un URI
                             activity.activityInfo.packageName, //Obtengo el nombre del paquete del resolveinfo
-                            uri,
+                            uri, //Asocio el fileprovider
                             Intent.FLAG_GRANT_WRITE_URI_PERMISSION); //Flag de permiso de escritura
 
                 }
@@ -180,9 +178,7 @@ public class CrimeFragment extends Fragment {
         });
         this.mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             //Metodo que se ejecuta cuando cambia el valor del edittext
             @Override
@@ -192,9 +188,7 @@ public class CrimeFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
 
         });
         this.mDateButton.setOnClickListener(new View.OnClickListener() {
@@ -228,16 +222,25 @@ public class CrimeFragment extends Fragment {
         this.mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //Instancio un intent con la accion send
                 Intent intent = new Intent(Intent.ACTION_SEND);
+
+                //Defino un tipo de dato MIME
                 intent.setType("text/plain");
+
+                //Inserto el reporte en el texto
                 intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-                intent.putExtra(Intent.EXTRA_SUBJECT,
-                        getString(R.string.crime_report_subject));
-                //Creamos un chooser para asegurarnos que el usuario usa
-                //siempre le aparezcan opciones de eleccion
+
+                //Inserto el sujeto
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
+
+                //Creamos un chooser para que aparezcan opciones de eleccion
                 intent = Intent.createChooser(intent,getString(R.string.send_report));
                 startActivity(intent);
+
             }
+
         });
         this.mSuspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -260,41 +263,33 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        //
+        //Si el codigo revuelto es distinto a result volvermos
         if(resultCode != Activity.RESULT_OK){
             return;
         }
 
-        //
+        //Si el resultado es igual al de request_Date, actualizamos la fecha
         if (requestCode == REQUEST_DATE){
-
-            //
             this.mCrime.setDate((Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE));
-
-            //
             updateCrime();
-
-            //
             this.mDateButton.setText(mCrime.getDate().toString());
-
         }
 
-        //añadimos el tratamiento del resultado devuelto por la app Contactos
+        //Añadimos el tratamiento del resultado devuelto por la app Contactos
         else if (requestCode == REQUEST_CONTACT && data != null){
 
-            //
+            //Instancio un Uri y obtengo la fecha
             Uri contactUri = data.getData();
 
-            //Especificamos el campo para el que queremos que la consulta
-            //devuelva valores
+            //Especificamos el campo para el que queremos sus valores
             String[] queryFields = new String[]{
                     ContactsContract.Contacts.DISPLAY_NAME
             };
 
             //Ejecutamos la consulta
             Cursor c = getActivity().getContentResolver().query(
-                    contactUri,
-                    queryFields,
+                    contactUri,          //Asociamos el Uri con la fecha
+                    queryFields,         //Asociamos la constante
                     null,
                     null,
                     null);
@@ -304,107 +299,110 @@ public class CrimeFragment extends Fragment {
                 //Comprobamos que hemos obtenidos resultados
                 if(c.getCount() == 0){ return;}
 
-                //Extraemos la primera columna
-                //Es el nombre del sospechoso
+                //Desplazamos el cursor al principio
                 c.moveToFirst();
 
-                //
+                //Insertamos el nombre del sospechoso
                 String suspect = c.getString(0);
 
-                //
+                //Cambiamos los datos del crime
                 this.mCrime.setSuspect(suspect);
 
-                //
+                //Llamamos al metodo para actualizar el crime
                 updateCrime();
 
-                //
+                //Cambiamos el texto del button
                 this.mSuspectButton.setText(suspect);
 
             }finally {
 
-                //
+                //Cerramos el cursor
                 c.close();
 
             }
 
-        //
+        //Añadimos el tratamiento de la foto
         } else if (requestCode == REQUEST_PHOTO){
 
-            //
+            //Obtengo el file provider mediante el standard RFC 2396 y le asocio el archivo
             Uri uri = FileProvider.getUriForFile(getActivity(),
                     "com.jcarlosprofesor.criminalintent.fileprovider",
                     this.mPhotoFile);
 
-            //
+            //Quitamos los permisos del provider de escritura
             getActivity().revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
-            //
+            //Actualizamos el crime
             updateCrime();
 
-            //
+            //Actulizamos la foto
             updatePhotoView();
 
         }
 
     }
 
-    //Sobreescribimos el metodo onPause para asegurarnos que las instancias
-    //modificadas de Crime son guardadas antes de que CrimeFragment finalice
-
+    //Metodo que se ejecuta cuando la aplicacion entra en segundo plano
     @Override
     public void onPause() {
         super.onPause();
-        //Llamamos al método que hemos implemantado en CrimeLab para actualizar
-        //un crimen
-        CrimeLab.get(getActivity())
-                .updateCrime(mCrime);
+
+        //Actualizamos el crime
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+
     }
 
-    //metodo que nos va a construir el informe de un crime concreto en ejecucion
+    //Metodo que nos va a construir el informe de un crime en ejecucion
     private String getCrimeReport(){
-        String solvedString = null;
-        if(this.mCrime.isSolved()){
-            solvedString = getString(R.string.crime_report_solved);
-        }
-        else{
-            solvedString = getString(R.string.crime_report_unsolved);
-        }
-        String dateFormat = "EEE MMM dd";
-        String dateString = DateFormat.format(dateFormat,mCrime.getDate()).toString();
 
+        //Si el crime esta resuelto obtengo un string u otro
+        String solvedString = this.mCrime.isSolved() ?
+                getString(R.string.crime_report_solved) :
+                getString(R.string.crime_report_unsolved);
+
+        //Defino un tipo de fecha
+        String dateString = DateFormat.format( "EEE MMM dd",mCrime.getDate()).toString();
+
+        //Obtengo el sospechoso
         String suspect = mCrime.getSuspect();
-        if(suspect == null){
-            suspect = getString(R.string.crime_report_no_suspect);
-        }else{
-            suspect = getString(R.string.crime_report_suspect, suspect);
-        }
-        String report = getString(R.string.crime_report,
-                mCrime.getTitle(),dateString,solvedString,suspect);
-        return report;
+
+        //Si es nulo obtengo uno u otro string
+        suspect = suspect == null ?
+                getString(R.string.crime_report_no_suspect) :
+                getString(R.string.crime_report_suspect, suspect);
+
+        //Retorno un string con la informacion del reporte
+        return getString(R.string.crime_report,
+                this.mCrime.getTitle(),dateString,solvedString,suspect);
+
     }
 
-    //metodo para cargat el objeto Bitmap en el ImageView
+    //Metodo para cargar el objeto Bitmap en el ImageView
     private void updatePhotoView(){
 
-        //
+        //Si el archivo es nulo o si no existe quitamos el contenido foto
         if(this.mPhotoFile == null || !this.mPhotoFile.exists()){
-
-            mPhotoView.setImageDrawable(null);
-
+            this.mPhotoView.setImageDrawable(null);
         }else{
 
-            //
+            //Instanciamos un bitmap y escalamos la imagen segun la ruta del archivo
             Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    this.mPhotoFile.getPath(), getActivity());
+                    this.mPhotoFile.getPath(),
+                    getActivity());
+
+            //Asociamos el bitmap a la view
             this.mPhotoView.setImageBitmap(bitmap);
+
         }
+
     }
 
-    //
+    //Metodo para actualizar el crime
     private void updateCrime(){
-
         CrimeLab.get(getActivity()).updateCrime(this.mCrime);
-        this.mCallbacks.onCrimeUpdated(this.mCrime);
 
+        //Envio el crime mediante la interfaz
+        this.mCallbacks.onCrimeUpdated(this.mCrime);
     }
+
 }

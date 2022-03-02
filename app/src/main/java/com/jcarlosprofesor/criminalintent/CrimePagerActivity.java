@@ -1,71 +1,78 @@
 package com.jcarlosprofesor.criminalintent;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
-
 import java.util.List;
 import java.util.UUID;
+public class CrimePagerActivity extends AppCompatActivity implements CrimeFragment.Callbacks{
 
-public class CrimePagerActivity extends AppCompatActivity
-implements CrimeFragment.Callbacks{
-
+    //Declaro una lista, viewpager y una variable para obtener el id del crime
     private static final String EXTRA_CRIME_ID = "crime_id";
     private ViewPager2 mViewPager;
     private List<Crime> mCrimes;
 
+    //Metodo que se ejecuta segun el ciclo de vida del fragment
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Asocio a la view un layout
         setContentView(R.layout.activity_crime_pager);
 
+        //Definimos un UUID obtengo del intent
         UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+
         //Traemos la lista de elemento Crime contenida en CrimeLab
-        mCrimes = CrimeLab.get(this).getCrimes();
+        this.mCrimes = CrimeLab.get(this).getCrimes();
+
         //Creamos el objeto mViewPager que mostrara los crimenes
-        mViewPager = (ViewPager2) findViewById(R.id.activity_crime_pager_view_pager);
-        //Creamos el objeto FragmentManager para manejar los fragment que vamos a cargar
-        //en el objeto mViewPager
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        this.mViewPager = (ViewPager2) findViewById(R.id.activity_crime_pager_view_pager);
+
         //Seteamos el adaptador necesario para leer los objetos Crime de la lista
-        mViewPager.setAdapter(new FragmentStateAdapter(this) {
+        this.mViewPager.setAdapter(new FragmentStateAdapter(this) {
             @NonNull
             @Override
+
+            //Metodo llamado para crear los fragments en funcion de la posicion
             public Fragment createFragment(int position) {
-                Crime crime = mCrimes.get(position);
-                return CrimeFragment.newInstance(crime.getId());
+                return CrimeFragment.newInstance(mCrimes.get(position).getId());
             }
 
+            //Defino la cantidad de views
             @Override
-            public int getItemCount() {
-                return mCrimes.size();
-            }
+            public int getItemCount() {return mCrimes.size();}
+
         });
+
+        //Establezco el primer elemento de la lista al iniciar el viewpager
         for(int i = 0; i < mCrimes.size(); i++){
-            if (mCrimes.get(i).getId().equals(crimeId)) {
-                mViewPager.setCurrentItem(i);
+
+            if (this.mCrimes.get(i).getId().equals(crimeId)) {
+
+                this.mViewPager.setCurrentItem(i);
+
             }
+
         }
-    }
-    public static Intent newIntent(Context packageContext, UUID crimeId){
-        Intent intent = new Intent(packageContext,CrimePagerActivity.class);
-        intent.putExtra(EXTRA_CRIME_ID,crimeId);
-        return intent;
+
     }
 
+    //Metodo para ejecutar la fragmentactivity con un ID en el intent
+    public static Intent newIntent(Context packageContext, UUID crimeId){
+        return new Intent(packageContext,CrimePagerActivity.class).putExtra(EXTRA_CRIME_ID,crimeId);
+    }
+
+    //Metodo para actualizar el fragment heredado
     @Override
     public void onCrimeUpdated(Crime crime) {
 
     }
+
 }

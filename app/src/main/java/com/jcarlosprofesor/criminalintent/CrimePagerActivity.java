@@ -2,6 +2,9 @@ package com.jcarlosprofesor.criminalintent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +21,10 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
     private ViewPager2 mViewPager;
     private List<Crime> mCrimes;
 
+    //Declaro dos buttons para el desplazamiento de la viewpager
+    private Button buttonStart;
+    private Button buttonFinal;
+
     //Metodo que se ejecuta segun el ciclo de vida del fragment
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,6 +35,34 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
 
         //Definimos un UUID obtengo del intent
         UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+
+        //Asociamos los widgets locales a sus view mediante su ID
+        this.buttonStart = (Button) findViewById(R.id.button_start);
+        this.buttonFinal = (Button) findViewById(R.id.button_final);
+
+        //Definimos el listener del buttonstart
+        this.buttonStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //Defino que hacer al hacer click
+                CrimePagerActivity.this.mViewPager.setCurrentItem(0);
+
+            }
+
+        });
+
+        //Definimos el listener del buttonfinal
+        this.buttonFinal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //Utilizamos el button final para cambiar la pagina actual
+                CrimePagerActivity.this.mViewPager.setCurrentItem(CrimeLab.get(CrimePagerActivity.this).getCrimes().size() -1);
+
+            }
+
+        });
 
         //Traemos la lista de elemento Crime contenida en CrimeLab
         this.mCrimes = CrimeLab.get(this).getCrimes();
@@ -51,11 +86,56 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
 
         });
 
+        //Defino un comportamiento al cambiar la pagina
+        this.mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
+
+                //Defino un index para obtener el indice actual en el que me encuentro
+                int indexContact = CrimePagerActivity.this.mViewPager.getCurrentItem();
+
+                //Desativo el widget de button en funcion de donde me encuentre
+                if(indexContact == 0){
+
+                    buttonStart.setEnabled(false);
+                    buttonFinal.setEnabled(true);
+
+                } else if (indexContact == CrimeLab.get(CrimePagerActivity.this).getCrimes().size() -1){
+
+                    buttonStart.setEnabled(true);
+                    buttonFinal.setEnabled(false);
+
+                } else {
+
+                    buttonStart.setEnabled(true);
+                    buttonFinal.setEnabled(true);
+
+                }
+
+            }
+
+        });
+
         //Establezco el primer elemento de la lista al iniciar el viewpager
         for(int i = 0; i < mCrimes.size(); i++){
 
             if (this.mCrimes.get(i).getId().equals(crimeId)) {
 
+                //Desactivamos el button
+                if(i == 0){buttonStart.setEnabled(false);}
+
+                //Cambiamos el actual item
                 this.mViewPager.setCurrentItem(i);
 
             }

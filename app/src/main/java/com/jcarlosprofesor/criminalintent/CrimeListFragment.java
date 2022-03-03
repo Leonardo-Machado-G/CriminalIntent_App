@@ -1,5 +1,6 @@
 package com.jcarlosprofesor.criminalintent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -29,6 +31,8 @@ public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
     private boolean mSubtitleVisible;
+    private TextView mNumberCrimes;
+    private Button mAddCrime;
 
     //Declaro una variable interface para la comunicacion con el fragment
     private Callbacks mCallbacks;
@@ -148,6 +152,29 @@ public class CrimeListFragment extends Fragment {
 
         //Asociamos el adapter a la recyclerview
         this.mCrimeRecyclerView.setAdapter(this.mAdapter);
+
+        //Serializo textcrime para indicar que no hay crimes
+        this.mNumberCrimes = (TextView) view.findViewById(R.id.no_crimes);
+
+        //Serializo addcrime para añadir un nuevo crime
+        this.mAddCrime = (Button) view.findViewById(R.id.add_crime_button);
+
+        //Defino un comportamiento para el boton
+        this.mAddCrime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Definimos un nuevo crime, lo añadimos a la lista e iniciamos un intent
+                Crime crime = new Crime();
+                CrimeLab.get(getActivity()).addCrime(crime);
+                Intent intent = CrimePagerActivity.newIntent(getActivity(),crime.getId());
+                startActivity(intent);
+
+            }
+
+        });
+
+
         return view;
 
     }
@@ -166,6 +193,22 @@ public class CrimeListFragment extends Fragment {
 
         //Instancio una lista de crimes y obtengo los del crimelab
         List<Crime> crimes = crimeLab.getCrimes();
+
+        //Si hay elementos en la lista hacemos invisible el textview
+        if(crimes.size() == 0){
+
+            //Indico al comienzo que este visible
+            this.mNumberCrimes.setVisibility(View.VISIBLE);
+            this.mAddCrime.setVisibility(View.VISIBLE);
+
+        } else {
+
+            //Indico al comienzo que este visible
+            this.mNumberCrimes.setVisibility(View.INVISIBLE);
+            this.mAddCrime.setVisibility(View.INVISIBLE);
+
+        }
+
 
         //Si el adapter es nulo accedemos
         if(this.mAdapter == null){

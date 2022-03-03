@@ -136,7 +136,7 @@ public class CrimeLab {
         String uuidString = crime.getId().toString();
 
         //Llamo a un metodo de la DB y borro el crime
-        mDatabase.delete(CrimeTable.NAME,
+        this.mDatabase.delete(CrimeTable.NAME,
                 CrimeTable.Cols.UUID + " = ?",
                 new String[]{uuidString});
 

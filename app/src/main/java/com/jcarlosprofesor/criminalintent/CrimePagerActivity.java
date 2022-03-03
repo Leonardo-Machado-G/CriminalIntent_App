@@ -2,6 +2,8 @@ package com.jcarlosprofesor.criminalintent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -25,6 +27,9 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
     private Button buttonStart;
     private Button buttonFinal;
 
+    //Definimos un UUID inicial del que partimos
+    private UUID crimeId;
+
     //Metodo que se ejecuta segun el ciclo de vida del fragment
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,7 +39,7 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
         setContentView(R.layout.activity_crime_pager);
 
         //Definimos un UUID obtengo del intent
-        UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+        this.crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
 
         //Asociamos los widgets locales a sus view mediante su ID
         this.buttonStart = (Button) findViewById(R.id.button_start);
@@ -102,6 +107,13 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
             public void onPageScrollStateChanged(int state) {
                 super.onPageScrollStateChanged(state);
 
+                //Cambio el ID actual
+                CrimePagerActivity.this.crimeId = CrimeLab
+                        .get(CrimePagerActivity.this)
+                        .getCrimes()
+                        .get(CrimePagerActivity.this.mViewPager.getCurrentItem())
+                        .getId();
+
                 //Defino un index para obtener el indice actual en el que me encuentro
                 int indexContact = CrimePagerActivity.this.mViewPager.getCurrentItem();
 
@@ -147,6 +159,36 @@ public class CrimePagerActivity extends AppCompatActivity implements CrimeFragme
     //Metodo para ejecutar la fragmentactivity con un ID en el intent
     public static Intent newIntent(Context packageContext, UUID crimeId){
         return new Intent(packageContext,CrimePagerActivity.class).putExtra(EXTRA_CRIME_ID,crimeId);
+    }
+
+    //Defino el menu que se va a cargar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.fragment_crime_detail,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    //Metodo que define detecta el item seleccionado del menu
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        //Defino un swich para definir el comportamiento del menu
+        switch (item.getItemId()){
+
+            case R.id.delete_crime:
+
+                //Borro el crimen seleccionado
+                CrimeLab.get(this).deleteCrime(CrimeLab.get(this).getCrime(this.crimeId));
+
+                //Retrocedemos en la activity
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
     }
 
     //Metodo para actualizar el fragment heredado

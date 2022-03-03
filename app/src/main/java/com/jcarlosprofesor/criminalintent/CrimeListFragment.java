@@ -186,6 +186,9 @@ public class CrimeListFragment extends Fragment {
 
         }
 
+        //Actualizamos los subtitulos
+        updateSubtitle();
+
     }
 
     //Inyectamos el archivo de layout del menu, en el objeto menu
@@ -259,9 +262,9 @@ public class CrimeListFragment extends Fragment {
         ((AppCompatActivity) getActivity()) //Obtenemos la activity
                 .getSupportActionBar()      //Obtenemos el menu
                 .setSubtitle(               //Indicamos el valor del subtitulo
-                !mSubtitleVisible ?         //Si esta visible le cambiamos el valro sino, sera nulo
+                !this.mSubtitleVisible ?         //Si esta visible le cambiamos el valro sino, sera nulo
                 null :
-                getString(R.string.subtitle_format,crimeCount));
+                getResources().getQuantityString(R.plurals.subtitle_plural,crimeCount,crimeCount));
 
     }
 

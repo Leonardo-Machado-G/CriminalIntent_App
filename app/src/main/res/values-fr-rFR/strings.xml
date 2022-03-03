@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">CriminalIntent</string>
+    <string name="crime_title_hint">"Entrez un titre pour le crime "</string>
+    <string name="crime_title_label">"Titre "</string>
+    <string name="crime_details_label">"Des détails "</string>
+    <string name="date_picker_title">"Date du crime "</string>
+    <string name="crime_solved_label">"Résolu "</string>
+    <string name="new_crime">"Nouveau crime "</string>
+    <string name="show_subtitle">"Enseigner des sous-titres "</string>
+    <string name="hide_subtitle">"Masquer les sous-titres "</string>
+    <string name="crime_suspect_text">"Choisissez suspect. "</string>
+    <string name="crime_report_text">"Envoyer un rapport de crime "</string>
+    <plurals name="subtitle_plural">
+        <item quantity="one">%1$d crime</item>
+        <item quantity="other">%1$d crimes</item>
+        <item quantity="many">%1$d crimes</item>
+    </plurals>
+    <string name="crime_report">%1$s! Le crime a été découvert à %2$s. %3$s, y %4$s</string>
+    <string name="crime_report_solved">"L'affaire est résolue "</string>
+    <string name="crime_report_unsolved">"L'affaire n'est pas résolue "</string>
+    <string name="crime_report_no_suspect">"Il n'y a pas de suspect "</string>
+    <string name="crime_report_suspect">Le suspect est %s.</string>
+    <string name="crime_report_subject">CriminalIntent Rapport Crime</string>
+    <string name="send_report">"Envoyer un crime à travers "</string>
+    <string name="button_final">Final</string>
+    <string name="button_start">"Début "</string>
+    <string name="time_picker_title">"Temps de crime "</string>
+    <string name="no_crimes">"Il n'y a pas de crime "</string>
+    <string name="delete_crime">Supprimer le crime</string>
+    <string name="crime_suspect_edit_text">"Entrez un nom pour le suspect "</string>
+</resources>

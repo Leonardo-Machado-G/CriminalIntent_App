@@ -22,5 +22,6 @@
     <string name="send_report">Send Crime report via</string>
     <string name="button_final">End</string>
     <string name="button_start">Start</string>
+    <string name="time_picker_title">Time of Crime</string>
 
 </resources>

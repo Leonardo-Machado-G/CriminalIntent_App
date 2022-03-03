@@ -42,6 +42,7 @@ public class CrimeFragment extends Fragment {
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
+    private Button mTimeButton;
 
     //Declaro una variable para la ruta de la foto
     private File mPhotoFile;
@@ -54,9 +55,10 @@ public class CrimeFragment extends Fragment {
         void onCrimeUpdated(Crime crime);
     }
 
-    //Instancio constantes para el DataPickerFragment y el ID
+    //Instancio constantes para el intercambio de datos
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
+    private static final String DIALOG_TIME = "DialogTime";
 
     //Constante para el código de petición
     private static final int REQUEST_DATE = 0;
@@ -66,6 +68,9 @@ public class CrimeFragment extends Fragment {
 
     //Constante para la peticion de tomar una foto
     private static final int REQUEST_PHOTO = 2;
+
+    //Constante para la peticion del timepicker
+    private static final int REQUEST_TIME = 3;
 
     //Metodo para obtener el contexto tras introducir el fragment
     @Override
@@ -120,12 +125,14 @@ public class CrimeFragment extends Fragment {
         this.mSolvedCheckBox = (CheckBox) view.findViewById(R.id.crime_solved);
         this.mReportButton = (Button) view.findViewById(R.id.crime_report);
         this.mSuspectButton = (Button) view.findViewById(R.id.crime_suspect);
+        this.mTimeButton = (Button) view.findViewById(R.id.crime_time);
 
         //Obtengo la informacion del crime
         this.mTitleField.setText(this.mCrime.getTitle());
         this.mDateButton.setText(this.mCrime.getDate().toString());
         this.mSolvedCheckBox.setChecked(this.mCrime.isSolved());
         this.mCrime.setSuspect(this.mCrime.getSuspect() != null ? this.mCrime.getSuspect(): null);
+        this.mTimeButton.setText("Time: " + this.mCrime.getDate().getHours() + ":" + this.mCrime.getDate().getMinutes());
 
         //Invocamos el metodo para cargar la imagen
         updatePhotoView();
@@ -252,6 +259,25 @@ public class CrimeFragment extends Fragment {
             }
 
         });
+        this.mTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //Instancio un fragmentmanager  para administrar los fragment
+                FragmentManager fragmentManager = getParentFragmentManager();
+
+                //Defino un nuevo fragment que sera un dialogo para timepicker
+                TimerPickerFragment dialog = TimerPickerFragment.newIntance(mCrime.getDate());
+
+                //Define la relación llamador / llamado entre 2 fragmentos
+                dialog.setTargetFragment(CrimeFragment.this,REQUEST_TIME);
+
+                //Llamamos al metodo para crear el dialog y mostrarlo
+                dialog.show(fragmentManager,DIALOG_TIME);
+
+            }
+
+        });
 
         //Retorno la view
         return view;
@@ -268,11 +294,22 @@ public class CrimeFragment extends Fragment {
             return;
         }
 
-        //Si el resultado es igual al de request_Date, actualizamos la fecha
+        //Si resultcode vale 0 insertamos una nueva fecha al crimen y al button
         if (requestCode == REQUEST_DATE){
-            this.mCrime.setDate((Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE));
-            updateCrime();
-            this.mDateButton.setText(mCrime.getDate().toString());
+
+            Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            this.mCrime.setDate(date);
+            this.mDateButton.setText(this.mCrime.getDate().toString());
+            this.mTimeButton.setText("TIME: " + (this.mCrime.getDate().getHours() + ":" + (this.mCrime.getDate().getMinutes())));
+
+        } else if (requestCode == REQUEST_TIME){
+
+            //Establezco una nueva hora para ambos buttons y actualizo la fecha del crime
+            Date time = (Date) data.getSerializableExtra(TimerPickerFragment.EXTRA_TIME);
+            this.mCrime.setDate(time);
+            this.mDateButton.setText(this.mCrime.getDate().toString());
+            this.mTimeButton.setText("TIME: " + (this.mCrime.getDate().getHours() + ":" + (this.mCrime.getDate().getMinutes())));
+
         }
 
         //Añadimos el tratamiento del resultado devuelto por la app Contactos

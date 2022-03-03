@@ -15,22 +15,22 @@ public class Crime {
     //Constructor sobrecargado para el cursor
     public Crime(){ this (UUID.randomUUID()); }
     public Crime(UUID id){
-        mId = id;
-        mDate = new Date();
+        this.mId = id;
+        this.mDate = new Date();
     }
 
     //Definimos los get de la clase
-    public UUID getId(){return mId;}
-    public String getTitle(){return mTitle;}
-    public Date getDate() {return mDate;}
-    public boolean isSolved(){return mSolved;}
-    public String getSuspect(){return mSuspect;}
+    public UUID getId(){return this.mId;}
+    public String getTitle(){return this.mTitle;}
+    public Date getDate() {return this.mDate;}
+    public boolean isSolved(){return this.mSolved;}
+    public String getSuspect(){return this.mSuspect;}
     public String getPhotoFilename(){return "IMG_"+getId().toString()+".jpg";}
 
     //Definimos los set de la clase
-    public void setTitle(String title) {mTitle = title;}
-    public void setDate(Date date) {mDate = date;}
-    public void setSolved(boolean solved) {mSolved = solved;}
-    public void setSuspect(String suspect){ mSuspect = suspect;}
+    public void setTitle(String title) {this.mTitle = title;}
+    public void setDate(Date date) {this.mDate = date;}
+    public void setSolved(boolean solved) {this.mSolved = solved;}
+    public void setSuspect(String suspect){this.mSuspect = suspect;}
 
 }

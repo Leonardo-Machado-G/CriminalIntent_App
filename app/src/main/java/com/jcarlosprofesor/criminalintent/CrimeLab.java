@@ -108,7 +108,7 @@ public class CrimeLab {
     public void addCrime(Crime c){
 
         //Mediante ContentValues añadimos filas en la BD
-        mDatabase.insert(CrimeTable.NAME,null,getContentValues(c));
+        this.mDatabase.insert(CrimeTable.NAME,null,getContentValues(c));
 
     }
 

@@ -1,6 +1,7 @@
 package com.jcarlosprofesor.criminalintent;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,15 +79,13 @@ public class CrimeListFragment extends Fragment {
         public void bind(Crime crime){
             this.mCrime = crime;
             this.mTitleTextView.setText(mCrime.getTitle());
-            this.mDateTextView.setText(mCrime.getDate().toString());
+            this.mDateTextView.setText(DateFormat.format("E, MMMM dd, yyyy",mCrime.getDate()));
             this.mSolvedImageView.setVisibility(crime.isSolved()?View.VISIBLE:View.GONE);
         }
 
         //Metodo que se ejecuta al hacer click en la view enviando un crime
         @Override
-        public void onClick(View v) {
-            mCallbacks.onCrimeSelected(mCrime);
-        }
+        public void onClick(View v) { mCallbacks.onCrimeSelected(mCrime); }
 
     }
 
@@ -111,7 +110,7 @@ public class CrimeListFragment extends Fragment {
         public void onBindViewHolder(@NonNull CrimeHolder holder, int position) {
 
             //Llamado al metodo para actualizar el contenido de sus widget
-            holder.bind( this.mCrimes.get(position));
+            holder.bind(this.mCrimes.get(position));
 
         }
 
@@ -148,7 +147,7 @@ public class CrimeListFragment extends Fragment {
         this.mAdapter = new CrimeAdapter(crimes);
 
         //Asociamos el adapter a la recyclerview
-        this.mCrimeRecyclerView.setAdapter(mAdapter);
+        this.mCrimeRecyclerView.setAdapter(this.mAdapter);
         return view;
 
     }
@@ -265,4 +264,5 @@ public class CrimeListFragment extends Fragment {
                 getString(R.string.subtitle_format,crimeCount));
 
     }
+
 }

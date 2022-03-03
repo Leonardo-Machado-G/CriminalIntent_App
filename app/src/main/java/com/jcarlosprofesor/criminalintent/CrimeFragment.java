@@ -40,6 +40,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private EditText mSuspectField;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
     private Button mTimeButton;
@@ -126,12 +127,15 @@ public class CrimeFragment extends Fragment {
         this.mReportButton = (Button) view.findViewById(R.id.crime_report);
         this.mSuspectButton = (Button) view.findViewById(R.id.crime_suspect);
         this.mTimeButton = (Button) view.findViewById(R.id.crime_time);
+        this.mSuspectField = (EditText) view.findViewById(R.id.edit_text_suspect);
+
 
         //Obtengo la informacion del crime
         this.mTitleField.setText(this.mCrime.getTitle());
         this.mDateButton.setText(this.mCrime.getDate().toString());
         this.mSolvedCheckBox.setChecked(this.mCrime.isSolved());
         this.mCrime.setSuspect(this.mCrime.getSuspect() != null ? this.mCrime.getSuspect(): null);
+        this.mSuspectField.setText(this.mCrime.getSuspect());
         this.mTimeButton.setText("Time: " + this.mCrime.getDate().getHours() + ":" + this.mCrime.getDate().getMinutes());
 
         //Invocamos el metodo para cargar la imagen
@@ -259,6 +263,23 @@ public class CrimeFragment extends Fragment {
             }
 
         });
+        this.mSuspectField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            //Metodo para detectar el cambio del widget
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                //Establezco el valor del sospechoso
+                mCrime.setSuspect(charSequence.toString());
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+
+        });
         this.mTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -347,9 +368,6 @@ public class CrimeFragment extends Fragment {
 
                 //Llamamos al metodo para actualizar el crime
                 updateCrime();
-
-                //Cambiamos el texto del button
-                this.mSuspectButton.setText(suspect);
 
             }finally {
 

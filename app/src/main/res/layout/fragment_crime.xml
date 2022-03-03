@@ -60,6 +60,13 @@
         android:id="@+id/crime_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_text_suspect"
+        android:textStyle="italic"
+        android:text="@string/crime_suspect_label"
+        android:hint="@string/crime_suspect_edit_text"/>
     <CheckBox
         android:id="@+id/crime_solved"
         android:layout_width="match_parent"
